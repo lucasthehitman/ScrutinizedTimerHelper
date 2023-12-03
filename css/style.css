@@ -1,0 +1,119 @@
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Tahoma', sans-serif;
+    font-size: 1rem;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 95vh;
+    margin-bottom: 1rem;
+}
+
+#background-image {
+    opacity: 0.2;
+    width: 100%;
+    position: fixed;
+    object-fit: cover;
+    object-position: center;
+    z-index: -1;
+    
+}
+
+.container {
+    width: 25%;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1a1a;
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+}
+
+.container::before{
+    content:'';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-image: url('napper.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+label {
+    font-family: 'Tahoma', sans-serif;
+    
+    margin: 0.4rem;
+    font-size: 1rem;
+}
+
+.main-text {
+    font-size: 2rem;
+}
+
+select,
+button {
+    width: 70%;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #333333;
+    color: #d8d8d8;
+    padding: 0.8rem;
+    border: none;
+    margin: 0.3rem;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    box-shadow: 0px 1rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.reset-button{
+    background-color:#523f3f
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+button:disabled {
+    background-color: #202020;
+    color: #5c5c5c;
+    cursor: not-allowed;
+}
+
+.timers-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timer-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.timer-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    
+}
+
+.big-spacer {
+    height: 1rem;
+}
+
+.small-spacer {
+    height: 0.7rem;
+}
+
+.hidden {
+    display: none;
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrutinized Time Helper</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="icon" href="images/icon.png" type="image/x-icon">
+</head>
+
+<body>
+    <img img id="background-image" src="images/background-phil.png" alt="Background Image">
+
+
+    <div class="container">
+        <div class="options-container">
+            <label class="main-text">Scrutinized Time Helper</label>
+            &nbsp;
+            <label for="difficulty">Difficulty:</label>
+            <select id="difficulty" onchange="updateNights()">
+                <option value="Casual">Casual</option>
+                <option value="Normal">Normal</option>
+                <option value="Nightmare">Nightmare</option>
+            </select>
+            
+            <label for="night">Night:</label>
+            <select id="night" onchange="resetTimers()">
+                <!-- Options will be dynamically added based on the selected difficulty -->
+            </select>
+        </div>
+    
+        <div class="big-spacer"></div>
+    
+        <label for="timerDisplay1">Light Timer:</label>
+        <div id="timers-container">
+            <div class="timer-container">
+                <div class="timer-display" id="timerDisplay1"></div>
+                <button id="startTimer1" onclick="startTimer(1)">Start Timer</button>
+                <button id="pauseTimer1" onclick="pauseTimer(1)" disabled>Pause Timer</button>
+            </div>
+    
+            <div class="small-spacer"></div>
+    
+            <label for="timerDisplay2">Tanner Cooldown Timer:</label>
+            <div class="timer-container">
+                <div class="timer-display" id="timerDisplay2"></div>
+                <button id="startTimer2" onclick="startTimer(2)">Start Timer</button>
+                <button id="pauseTimer2" onclick="pauseTimer(2)" disabled>Pause Timer</button>
+            </div>
+        </div>
+    
+        <button class="reset-button" id="resetTimers" onclick="resetTimers()">Reset Timers</button>
+    </div>
+
+    <audio id="soundEffect" autoplay>
+        <source src="sounds/timerOver.wav" type="audio/mp3">
+        Your browser does not support the audio tag.
+    </audio>
+
+    <script>
+        let timer1, timer2;
+        let timerOptions = {
+            "Casual": { timer1: ["180", "180", "120", "90", "60", "", "", "", "", "", "", "", "", ""], timer2: ["225", "225", "225", "225", "225", "", "", "", "", "", "", "", "", ""] },
+            "Normal": { timer1: ["180", "180", "120", "90", "100", "70", "70", "70", "60", "50", "", "", "", ""], timer2: ["200", "200", "200", "200", "200", "200", "200", "200", "200", "200", "", "", "", ""] },
+            "Nightmare": { timer1: ["180", "180", "120", "90", "90", "60", "60", "60", "60", "50", "50", "45", "40", "40"], timer2: ["150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150"] }
+        };
+        let selectedDifficulty = document.getElementById("difficulty").value;
+        let selectedNight = document.getElementById("night").value;
+        let startTime1, startTime2;
+        let elapsedTime1 = 0;
+        let elapsedTime2 = 0;
+
+
+        function updateNights() {
+            selectedDifficulty = document.getElementById("difficulty").value;
+            const nightDropdown = document.getElementById("night");
+            nightDropdown.innerHTML = "";
+
+            const numNights = (selectedDifficulty === "Casual" ? 5 : (selectedDifficulty === "Normal" ? 10 : 14));
+
+            for (let i = 1; i <= numNights; i++) {
+                const option = document.createElement("option");
+                option.value = `Night${i}`;
+                option.text = `Night ${i}`;
+                nightDropdown.add(option);
+            }
+
+            resetTimers();
+        }
+
+        function playSound() {
+            var soundEffect = document.getElementById("soundEffect");
+
+            if (soundEffect.paused) {
+                soundEffect.play();
+            } else {
+                soundEffect.pause();
+                soundEffect.currentTime = 0;
+            }
+        }
+
+        function startTimer(timerNumber) {
+            const startButton = document.getElementById(`startTimer${timerNumber}`);
+            const pauseButton = document.getElementById(`pauseTimer${timerNumber}`);
+            const timerDisplay = document.getElementById(`timerDisplay${timerNumber}`);
+            const selectedNightIndex = document.getElementById("night").selectedIndex;
+            const duration = timerOptions[selectedDifficulty][`timer${timerNumber}`][selectedNightIndex];
+
+            startButton.disabled = true;
+            pauseButton.disabled = false;
+
+            let startTime;
+            let elapsedTime;
+
+            if (timerNumber === 1) {
+                if (timer1) clearInterval(timer1);
+                startTime = new Date().getTime() - (elapsedTime1 * 1000);
+                elapsedTime = elapsedTime1;
+            } else if (timerNumber === 2) {
+                if (timer2) clearInterval(timer2);
+                startTime = new Date().getTime() - (elapsedTime2 * 1000);
+                elapsedTime = elapsedTime2;
+            }
+
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes}m ${remainingSeconds}s`;
+            }
+
+            const timer = setInterval(() => {
+                elapsedTime = Math.floor((new Date().getTime() - startTime) / 1000);
+                const remainingTime = duration - elapsedTime;
+
+                if (remainingTime >= 0) {
+                    timerDisplay.innerText = formatTime(remainingTime);
+                } else {
+                    clearInterval(timer);
+                    playSound();
+                    startButton.disabled = false;
+                    pauseButton.disabled = true;
+                    timerDisplay.innerText = "0m 0s";
+                }
+            }, 100);
+
+            if (timerNumber === 1) {
+                timer1 = timer;
+            } else if (timerNumber === 2) {
+                timer2 = timer;
+            }
+
+            const remainingTime = duration - elapsedTime;
+            if (remainingTime >= 0) {
+                timerDisplay.innerText = formatTime(remainingTime);
+            } else {
+                clearInterval(timer);
+                startButton.disabled = false;
+                pauseButton.disabled = true;
+                timerDisplay.innerText = "0s";
+            }
+
+            pauseButton.onclick = function () {
+                if (timerNumber === 1) {
+                    elapsedTime1 = elapsedTime;
+                } else if (timerNumber === 2) {
+                    elapsedTime2 = elapsedTime;
+                }
+                clearInterval(timer);
+                pauseButton.disabled = true;
+                startButton.disabled = false;
+            };
+        }
+
+        function pauseTimer(timerNumber) {
+            const pauseButton = document.getElementById(`pauseTimer${timerNumber}`);
+            const startButton = document.getElementById(`startTimer${timerNumber}`);
+
+            pauseButton.disabled = true;
+            startButton.disabled = false;
+        }
+
+        function resetTimers() {
+            clearInterval(timer1);
+            clearInterval(timer2);
+
+            const startButton1 = document.getElementById("startTimer1");
+            const pauseButton1 = document.getElementById("pauseTimer1");
+            const timerDisplay1 = document.getElementById("timerDisplay1");
+
+            const startButton2 = document.getElementById("startTimer2");
+            const pauseButton2 = document.getElementById("pauseTimer2");
+            const timerDisplay2 = document.getElementById("timerDisplay2");
+
+            startButton1.disabled = false;
+            pauseButton1.disabled = true;
+            timerDisplay1.innerText = "";
+
+            startButton2.disabled = false;
+            pauseButton2.disabled = true;
+            timerDisplay2.innerText = "";
+
+            pauseButton1.innerHTML = "Pause";
+            pauseButton1.onclick = function () { pauseTimer(1); };
+
+            pauseButton2.innerHTML = "Pause";
+            pauseButton2.onclick = function () { pauseTimer(2); };
+
+            elapsedTime1 = 0;
+            elapsedTime2 = 0;
+        }
+
+        updateNights();
+    </script>
+</body>
+
+</html>
