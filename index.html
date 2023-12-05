@@ -9,14 +9,16 @@
     <link rel="icon" href="images/icon.png" type="image/x-icon">
 </head>
 
-<body>
-    <img img id="background-image" src="images/background.png" alt="Background Image">
+<body onload="surprise();">
+    <img img id="background-image" src="" alt="Background Image">
 
 
     <div class="container">
         <div class="options-container">
             <label class="main-text">Scrutinized Time Helper</label>
+            <div id="surprise"></div>
             &nbsp;
+
             <label for="difficulty">Difficulty:</label>
             <select id="difficulty" onchange="updateNights()">
                 <option value="Casual">Casual</option>
@@ -58,6 +60,8 @@
         Your browser does not support the audio tag.
     </audio>
 
+
+
     <script>
         let timer1, timer2;
         let timerOptions = {
@@ -71,6 +75,34 @@
         let elapsedTime1 = 0;
         let elapsedTime2 = 0;
 
+
+        function surprise() {
+            const params = new URLSearchParams(document.location.search);
+            const param = params.get("troo");
+            var bgImage = document.getElementById("background-image");
+            
+            surpriseText = document.createElement("div");
+
+            kappaImg = document.createElement("img");
+            kappaImg.src = "images/kappa.png";
+            kappaImg.width = "50";
+            kappaImg.height = "50";
+
+            if(param == null) {
+                console.info("Default background");
+                bgImage.src = "images/background.png";
+                return;
+            }
+
+            console.info("Surprise background");
+            bgImage.src = "images/background-phil.png";
+            surpriseText.innerText = "Don't get fucked by the napper";
+
+
+            var container = document.getElementById("surprise");
+            container.append(surpriseText);
+            container.append(kappaImg);
+        }
 
         function updateNights() {
             selectedDifficulty = document.getElementById("difficulty").value;
