@@ -9,14 +9,19 @@
     <link rel="icon" href="images/icon.png" type="image/x-icon">
 </head>
 
-<body onload="surprise();">
+<body onload="onPageLoad();">
     <img img id="background-image" src="" alt="Background Image">
 
+    <audio id="soundEffect" autoplay>
+        <source src="sounds/timerOver.wav" type="audio/mp3">
+        Your browser does not support the audio tag.
+    </source>
+    </audio>
 
     <div class="container">
         <div class="options-container">
             <label class="main-text">Scrutinized Time Helper</label>
-            <div id="surprise"></div>
+            <div id="hidden-text"></div>
             &nbsp;
 
             <label for="difficulty">Difficulty:</label>
@@ -28,7 +33,6 @@
             
             <label for="night">Night:</label>
             <select id="night" onchange="resetTimers()">
-                <!-- Options will be dynamically added based on the selected difficulty -->
             </select>
         </div>
     
@@ -53,16 +57,15 @@
         </div>
     
         <button class="reset-button" id="resetTimers" onclick="resetTimers()">Reset Timers</button>
+        <button onclick="playSound()">Play Audio</button>
     </div>
 
-    <audio id="soundEffect" autoplay>
-        <source src="sounds/timerOver.wav" type="audio/mp3">
-        Your browser does not support the audio tag.
-    </audio>
+    
 
 
 
     <script>
+        window.onload = onPageLoad();
         let timer1, timer2;
         let timerOptions = {
             "Casual": { timer1: ["180", "180", "120", "90", "60", "", "", "", "", "", "", "", "", ""], timer2: ["225", "225", "225", "225", "225", "", "", "", "", "", "", "", "", ""] },
@@ -75,33 +78,35 @@
         let elapsedTime1 = 0;
         let elapsedTime2 = 0;
 
+        function onPageLoad() {
+            var container = document.getElementById("hidden-text");
 
-        function surprise() {
-            const params = new URLSearchParams(document.location.search);
-            const param = params.get("troo");
+            const urlParams = new URLSearchParams(window.location.search);
             var bgImage = document.getElementById("background-image");
             
-            surpriseText = document.createElement("div");
+            //Easter egg stuff
+            if(urlParams.has('troo-imsorry') || urlParams.has('troo')){
+                console.info("Surprise background");
+                bgImage.src = "images/background-phil.png";
 
-            kappaImg = document.createElement("img");
-            kappaImg.src = "images/kappa.png";
-            kappaImg.width = "50";
-            kappaImg.height = "50";
+                surpriseText = document.createElement("div");
+                surpriseText.innerText = "Don't get fucked by the napper";
+                container.appendChild(surpriseText);
 
-            if(param == null) {
-                console.info("Default background");
-                bgImage.src = "images/background.png";
+                kappaImg = document.createElement("img");
+                kappaImg.src = "images/kappa.png";
+                kappaImg.width = "50";
+                kappaImg.height = "50";
+                container.appendChild(kappaImg);
+                
+                if(urlParams.has('troo')) document.getElementById("soundEffect").setAttribute('src', 'sounds/pipe.wav');
                 return;
             }
 
-            console.info("Surprise background");
-            bgImage.src = "images/background-phil.png";
-            surpriseText.innerText = "Don't get fucked by the napper";
-
-
-            var container = document.getElementById("surprise");
-            container.append(surpriseText);
-            container.append(kappaImg);
+            console.info("Default background");
+            bgImage.src = "images/background.png";
+            document.getElementById("soundEffect").setAttribute('src', 'sounds/timerOver.wav'); 
+            
         }
 
         function updateNights() {
