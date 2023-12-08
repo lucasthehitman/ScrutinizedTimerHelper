@@ -15,7 +15,7 @@
     <audio id="soundEffect" autoplay>
         <source src="sounds/timerOver.wav" type="audio/mp3">
         Your browser does not support the audio tag.
-    </source>
+        </source>
     </audio>
 
     <div class="container">
@@ -30,14 +30,14 @@
                 <option value="Normal">Normal</option>
                 <option value="Nightmare">Nightmare</option>
             </select>
-            
+
             <label for="night">Night:</label>
             <select id="night" onchange="resetTimers()">
             </select>
         </div>
-    
+
         <div class="big-spacer"></div>
-    
+
         <label for="timerDisplay1">Light Timer:</label>
         <div id="timers-container">
             <div class="timer-container">
@@ -45,9 +45,9 @@
                 <button id="startTimer1" onclick="startTimer(1)">Start Timer</button>
                 <button id="pauseTimer1" onclick="pauseTimer(1)" disabled>Pause Timer</button>
             </div>
-    
+
             <div class="small-spacer"></div>
-    
+
             <label for="timerDisplay2">Tanner Cooldown Timer:</label>
             <div class="timer-container">
                 <div class="timer-display" id="timerDisplay2"></div>
@@ -55,11 +55,11 @@
                 <button id="pauseTimer2" onclick="pauseTimer(2)" disabled>Pause Timer</button>
             </div>
         </div>
-    
+
         <button class="reset-button" id="resetTimers" onclick="resetTimers()">Reset Timers</button>
     </div>
 
-    
+
 
 
 
@@ -82,9 +82,9 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             var bgImage = document.getElementById("background-image");
-            
+
             //Easter egg stuff
-            if(urlParams.has('troo-imsorry') || urlParams.has('troo')){
+            if (urlParams.has('troo-imsorry') || urlParams.has('troo')) {
                 console.info("Surprise background");
                 bgImage.src = "images/background-phil.png";
 
@@ -97,15 +97,15 @@
                 kappaImg.width = "50";
                 kappaImg.height = "50";
                 container.appendChild(kappaImg);
-                
-                if(urlParams.has('troo')) document.getElementById("soundEffect").setAttribute('src', 'sounds/pipe.wav');
+
+                if (urlParams.has('troo')) document.getElementById("soundEffect").setAttribute('src', 'sounds/pipe.wav');
                 return;
             }
 
             console.info("Default background");
             bgImage.src = "images/background.png";
-            document.getElementById("soundEffect").setAttribute('src', 'sounds/timerOver.wav'); 
-            
+            document.getElementById("soundEffect").setAttribute('src', 'sounds/timerOver.wav');
+
         }
 
         function updateNights() {
