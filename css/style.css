@@ -1,123 +1,193 @@
 body {
-    background-color: #000000;
-    color: #ffffff;
     font-family: 'Tahoma', sans-serif;
-    font-size: 1rem;
-    flex-direction: column;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     text-align: center;
-    height: 95vh;
-    margin-bottom: 1rem;
-}
-
-#background-image {
-    opacity: 0.2;
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    object-fit: cover;
-    object-position: center;
-    z-index: -1;
-    
-}
-
-.container {
-    width: 90%;
-    max-width: 600px;
-    flex-direction: column;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #1a1a1a;
-    padding: 1rem;
-    border-radius: 1rem;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
-}
-
-.container::before{
-    content:'';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background-size: cover;
-    background-repeat: no-repeat;
+    margin: 1.5em;
+    /* Adjusted margin for better spacing */
+    overflow-x: hidden;
+    background-color: #000000;
+    /* Dark background color */
+    color: #fff;
+    /* White text color */
 }
 
 label {
     font-family: 'Tahoma', sans-serif;
-    
-    margin: 0.4rem;
     font-size: 1rem;
 }
 
-.main-text {
-    font-size: 2rem;
-}
-
-select,
 button {
-    width: 70%;
-    font-size: 1rem;
-    font-weight: bold;
-    background-color: #333333;
-    color: #d8d8d8;
-    padding: 0.8rem;
-    border: none;
-    margin: 0.3rem;
+    font-size: 1em;
+    margin: 0.5em;
+    padding: 1em;
     cursor: pointer;
-    border-radius: 0.5rem;
-    box-shadow: 0px 1rem 1rem rgba(0, 0, 0, 0.2);
+    width: 80%;
+    max-width: 15em;
+    /* Adjusted max-width */
+    background-color: rgba(50, 50, 50, 0.7);
+    /* Dark gray and transparent button color */
+    color: #e0e0e0;
+    border: none;
+    border-radius: 0.8em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.reset-button{
-    background-color:#523f3f
+button:hover {
+    background-color: rgba(70, 70, 70, 0.7);
+    /* Darker gray and transparent on hover */
 }
 
-.options-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 2rem;
+button:active {
+    background-color: rgba(50, 50, 50, 0.7);
+    transform: scale(0.98);
 }
 
 button:disabled {
-    background-color: #202020;
-    color: #5c5c5c;
+    background-color: #444;
+    /* Darker gray for disabled state */
+    color: #888;
+    /* Lighter gray text for disabled state */
     cursor: not-allowed;
 }
 
-.timers-container {
+
+#timerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 300px;
+    padding: 1em;
+    padding-bottom: 0.2em;
+    border: 0.1em solid rgb(59, 59, 59);
+    border-radius: 0.8em;
+    background-color: rgba(22, 20, 20, 0.548);
+}
+
+.timer-display {
+    margin: 0.5em;
+    padding: 0.3em;
+    border: 0.1em solid rgba(0, 0, 0, 0);
+    /* Semi-transparent dark gray border */
+    width: 80%;
+    border-radius: 0.8em;
+    max-width: 15em;
+    /* Adjusted max-width */
+    background-color: rgba(22, 20, 20, 0);
+    /* Darker gray and transparent background color */
+}
+
+/* Add a custom class to the start button of the first timer */
+#mainNightStartButton {
+    font-size: 1.2em;
+    /* Adjusted font size */
+    max-width: 20em;
+    /* Adjusted max-width */
+    font-weight: bold;
+    /* Make the text bold */
+    margin-bottom: 2rem;
+    width: 90%;
+    color: #fff;
+}
+
+#mainNightStartButton:disabled {
+    background-color: #444;
+    /* Darker gray for disabled state */
+    color: #888;
+    /* Lighter gray text for disabled state */
+    cursor: not-allowed;
+}
+
+
+
+#resetTimersButton {
+    position: fixed;
+    margin-top: 1em;
+    font-size: 1em;
+    padding: 1em;
+    cursor: pointer;
+    position: fixed;
+    bottom: 1em;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 20em;
+    /* Adjusted max-width */
+    background-color: #47302e;
+    /* Red button color */
+    color: #fff;
+    border: none;
+    border-radius: 0.8em;
+    transition: background-color 0.3s ease;
+}
+
+#resetTimersButton:hover {
+    background-color: #8d3127;
+    /* Darker red on hover */
+}
+
+/* Dropdown styling */
+label {
+    color: #fff;
+    font-size: 1em;
+    /* Adjusted font size */
+    margin-bottom: 0.5em;
+}
+
+select {
+    font-size: 1em;
+    /* Adjusted font size */
+    padding: 0.8em;
+    /* Adjusted padding */
+    margin: 0.5em;
+    width: 80%;
+    max-width: 15em;
+    /* Adjusted max-width */
+    background-color: rgba(50, 50, 50, 0.7);
+    /* Dark gray and transparent */
+    color: #ffffff;
+    border: none;
+    border-radius: 0.8em;
+}
+
+/* Background image styling */
+#background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 30%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+#dropdownContainer {
+    text-align: center;
+    /* Optional: Center the dropdowns if needed */
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.timer-container {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.timer-display {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    
-}
-
-.big-spacer {
-    height: 1rem;
-}
-
-.small-spacer {
-    height: 0.7rem;
+#dropdownContainer label,
+#dropdownContainer select {
+    display: block;
+    /* Use block layout for better mobile display */
+    width: 80%;
+    max-width: 15em;
+    /* Adjusted max-width */
 }
 
 #hidden-text {
     display: flex;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    /* Adjusted font size */
+    font-weight: bold;
+    /* Make the text bold */
+    color: #fff;
 }
 
 .hidden {

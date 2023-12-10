@@ -2,252 +2,429 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrutinized Time Helper</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link rel="icon" href="images/icon.png" type="image/x-icon">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrutinized Timer Helper</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="icon" href="images/icon.png" type="image/x-icon">
 </head>
 
-<body onload="onPageLoad();">
-    <img img id="background-image" src="" alt="Background Image">
+<body onload="onPageLoad()">
+  <img img id="background-image" src="" alt="Background Image">
+  <div id="hidden-text"></div>
 
-    <audio id="soundEffect" autoplay>
-        <source src="sounds/timerOver.wav" type="audio/mp3">
-        Your browser does not support the audio tag.
-        </source>
-    </audio>
+  <audio id="soundEffect" autoplay>
+    <source src="sounds/timerOver.wav" type="audio/mp3">
+    Your browser does not support the audio tag.
+    </source>
+  </audio>
 
-    <div class="container">
-        <div class="options-container">
-            <label class="main-text">Scrutinized Time Helper</label>
-            <div id="hidden-text"></div>
-            &nbsp;
 
-            <label for="difficulty">Difficulty:</label>
-            <select id="difficulty" onchange="updateNights()">
-                <option value="Casual">Casual</option>
-                <option value="Normal">Normal</option>
-                <option value="Nightmare">Nightmare</option>
-            </select>
+  <div id="dropdownContainer">
+    <!-- Difficulty Dropdown -->
+    <label for="difficulty">Difficulty:</label>
+    <select id="difficulty" onchange="updateTimers()">
+      <option value="Casual">Casual</option>
+      <option value="Normal">Normal</option>
+      <option value="Nightmare">Nightmare</option>
+    </select>
 
-            <label for="night">Night:</label>
-            <select id="night" onchange="resetTimers()">
-            </select>
-        </div>
+    <!-- Night Dropdown -->
+    <label for="night">Night:</label>
+    <select id="night" onchange="updateTimers()">
+      <!-- Night options will be dynamically populated based on the selected difficulty -->
+    </select>
+  </div>
 
-        <div class="big-spacer"></div>
+  <div style="height: 1rem"></div>
+  <!-- Timer Container -->
+  <div id="timerContainer"></div>
 
-        <label for="timerDisplay1">Light Timer:</label>
-        <div id="timers-container">
-            <div class="timer-container">
-                <div class="timer-display" id="timerDisplay1"></div>
-                <button id="startTimer1" onclick="startTimer(1)">Start Timer</button>
-                <button id="pauseTimer1" onclick="pauseTimer(1)" disabled>Pause Timer</button>
-            </div>
+  <!-- Pause/Continue Timers Button -->
+  <!-- Start button -->
+  <button id="pauseTimersButton" class="${isStartButtonPressed ? 'start-button-pressed' : ''}">Pause Timers</button>
 
-            <div class="small-spacer"></div>
 
-            <label for="timerDisplay2">Tanner Cooldown Timer:</label>
-            <div class="timer-container">
-                <div class="timer-display" id="timerDisplay2"></div>
-                <button id="startTimer2" onclick="startTimer(2)">Start Timer</button>
-                <button id="pauseTimer2" onclick="pauseTimer(2)" disabled>Pause Timer</button>
-            </div>
-        </div>
-
-        <button class="reset-button" id="resetTimers" onclick="resetTimers()">Reset Timers</button>
-    </div>
+  <!-- Reset Timers Button -->
+  <button id="resetTimersButton">Reset Night</button>
 
 
 
+  <script>
+    let selectedNight = 0;
+    let hasBeenWarned = false;
+    let isStartButtonPressed = false;
+    let flag = true;
 
+    //// Timer Class
+    class Timer {
+      constructor(duration, onUpdate, onComplete, isCountingUp) {
+        this.duration = duration;
+        this.onUpdate = onUpdate;
+        this.onComplete = onComplete;
+        this.timer = null;
+        this.isRunning = false;
+        this.remainingTime = isCountingUp ? 0 : duration;
+        this.isCountingUp = isCountingUp;
+        this.state = 'stopped'; // Initial state
+        this.startButton = null;
+      }
 
-    <script>
-        window.onload = onPageLoad();
-        let timer1, timer2;
-        let timerOptions = {
-            "Casual": { timer1: ["180", "180", "120", "90", "60", "", "", "", "", "", "", "", "", ""], timer2: ["225", "225", "225", "225", "225", "", "", "", "", "", "", "", "", ""] },
-            "Normal": { timer1: ["180", "180", "120", "90", "100", "70", "70", "70", "60", "50", "", "", "", ""], timer2: ["200", "200", "200", "200", "200", "200", "200", "200", "200", "200", "", "", "", ""] },
-            "Nightmare": { timer1: ["180", "180", "120", "90", "90", "60", "60", "60", "60", "50", "50", "45", "40", "40"], timer2: ["150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150"] }
-        };
-        let selectedDifficulty = document.getElementById("difficulty").value;
-        let selectedNight = document.getElementById("night").value;
-        let startTime1, startTime2;
-        let elapsedTime1 = 0;
-        let elapsedTime2 = 0;
-
-        function onPageLoad() {
-            var container = document.getElementById("hidden-text");
-
-            const urlParams = new URLSearchParams(window.location.search);
-            var bgImage = document.getElementById("background-image");
-
-            //Easter egg stuff
-            if (urlParams.has('troo-imsorry') || urlParams.has('troo')) {
-                console.info("Surprise background");
-                bgImage.src = "images/background-phil.png";
-
-                surpriseText = document.createElement("div");
-                surpriseText.innerText = "Don't get fucked by the napper";
-                container.appendChild(surpriseText);
-
-                kappaImg = document.createElement("img");
-                kappaImg.src = "images/kappa.png";
-                kappaImg.width = "50";
-                kappaImg.height = "50";
-                container.appendChild(kappaImg);
-
-                if (urlParams.has('troo')) document.getElementById("soundEffect").setAttribute('src', 'sounds/pipe.wav');
-                return;
-            }
-
-            console.info("Default background");
-            bgImage.src = "images/background.png";
-            document.getElementById("soundEffect").setAttribute('src', 'sounds/timerOver.wav');
-
+      start() {
+        // If no selected night
+        if (isNaN(parseInt(document.getElementById("night").value))) {
+          if (!hasBeenWarned) { alert("Please select a valid night."); hasBeenWarned = true; }
+          return;
         }
 
-        function updateNights() {
-            selectedDifficulty = document.getElementById("difficulty").value;
-            const nightDropdown = document.getElementById("night");
-            nightDropdown.innerHTML = "";
+        this.stop(); // Stop existing timer if any
+        this.updateDisplay();
 
-            const numNights = (selectedDifficulty === "Casual" ? 5 : (selectedDifficulty === "Normal" ? 10 : 14));
 
-            for (let i = 1; i <= numNights; i++) {
-                const option = document.createElement("option");
-                option.value = `Night${i}`;
-                option.text = `Night ${i}`;
-                nightDropdown.add(option);
-            }
+        //this.enableStartButton();
 
-            resetTimers();
+
+        this.timer = setInterval(() => {
+          if (this.isCountingUp) {
+            this.remainingTime++;
+          } else {
+            this.remainingTime--;
+          }
+
+          if (this.isCountingUp && this.remainingTime > this.duration) {
+            this.stop();
+            this.onComplete();
+          } else if (!this.isCountingUp && this.remainingTime < 0) {
+            this.stop();
+            this.onComplete();
+          } else {
+            this.updateDisplay();
+          }
+        }, 1000);
+
+        this.isRunning = true;
+        this.state = 'running';
+      }
+
+      pause() {
+        if (this.isRunning) {
+          clearInterval(this.timer);
+          this.isRunning = false;
+          this.state = 'paused';
         }
+      }
 
-        function playSound() {
-            var soundEffect = document.getElementById("soundEffect");
-
-            if (soundEffect.paused) {
-                soundEffect.play();
-            } else {
-                soundEffect.pause();
-                soundEffect.currentTime = 0;
-            }
+      continue() {
+        if (!this.isRunning && this.state === 'paused') {
+          this.start();
         }
+      }
 
-        function startTimer(timerNumber) {
-            const startButton = document.getElementById(`startTimer${timerNumber}`);
-            const pauseButton = document.getElementById(`pauseTimer${timerNumber}`);
-            const timerDisplay = document.getElementById(`timerDisplay${timerNumber}`);
-            const selectedNightIndex = document.getElementById("night").selectedIndex;
-            const duration = timerOptions[selectedDifficulty][`timer${timerNumber}`][selectedNightIndex];
+      stop() {
+        clearInterval(this.timer);
+        this.isRunning = false;
+        this.state = 'stopped';
+      }
 
-            startButton.disabled = true;
-            pauseButton.disabled = false;
+      reset() {
+        this.stop();
+        this.remainingTime = this.isCountingUp ? 0 : this.duration;
+        this.updateDisplay();
+      }
 
-            let startTime;
-            let elapsedTime;
+      updateDisplay() {
+        this.onUpdate(this.formatTime(this.remainingTime));
+      }
 
-            if (timerNumber === 1) {
-                if (timer1) clearInterval(timer1);
-                startTime = new Date().getTime() - (elapsedTime1 * 1000);
-                elapsedTime = elapsedTime1;
-            } else if (timerNumber === 2) {
-                if (timer2) clearInterval(timer2);
-                startTime = new Date().getTime() - (elapsedTime2 * 1000);
-                elapsedTime = elapsedTime2;
-            }
+      formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+      }
 
-            function formatTime(seconds) {
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = seconds % 60;
-                return `${minutes}m ${remainingSeconds}s`;
-            }
-
-            const timer = setInterval(() => {
-                elapsedTime = Math.floor((new Date().getTime() - startTime) / 1000);
-                const remainingTime = duration - elapsedTime;
-
-                if (remainingTime >= 0) {
-                    timerDisplay.innerText = formatTime(remainingTime);
-                } else {
-                    clearInterval(timer);
-                    playSound();
-                    startButton.disabled = false;
-                    pauseButton.disabled = true;
-                    timerDisplay.innerText = "0m 0s";
-                }
-            }, 100);
-
-            if (timerNumber === 1) {
-                timer1 = timer;
-            } else if (timerNumber === 2) {
-                timer2 = timer;
-            }
-
-            const remainingTime = duration - elapsedTime;
-            if (remainingTime >= 0) {
-                timerDisplay.innerText = formatTime(remainingTime);
-            } else {
-                clearInterval(timer);
-                startButton.disabled = false;
-                pauseButton.disabled = true;
-                timerDisplay.innerText = "0s";
-            }
-
-            pauseButton.onclick = function () {
-                if (timerNumber === 1) {
-                    elapsedTime1 = elapsedTime;
-                } else if (timerNumber === 2) {
-                    elapsedTime2 = elapsedTime;
-                }
-                clearInterval(timer);
-                pauseButton.disabled = true;
-                startButton.disabled = false;
-            };
+      disableStartButton() {
+        if (this.startButton) {
+          this.startButton.disabled = true;
         }
+      }
 
-        function pauseTimer(timerNumber) {
-            const pauseButton = document.getElementById(`pauseTimer${timerNumber}`);
-            const startButton = document.getElementById(`startTimer${timerNumber}`);
-
-            pauseButton.disabled = true;
-            startButton.disabled = false;
+      enableStartButton() {
+        if (this.startButton) {
+          this.startButton.disabled = false;
         }
+      }
+    }
 
-        function resetTimers() {
-            clearInterval(timer1);
-            clearInterval(timer2);
+    //// Function to Setup Timer
+    function setupTimer(containerId, duration, onUpdate, onComplete, isCountingUp, startButtonName = "Start", isMainNightTimer = false) {
+      const container = document.getElementById(containerId);
 
-            const startButton1 = document.getElementById("startTimer1");
-            const pauseButton1 = document.getElementById("pauseTimer1");
-            const timerDisplay1 = document.getElementById("timerDisplay1");
+      const timerDisplay = document.createElement("div");
+      timerDisplay.className = "timer-display";
+      container.appendChild(timerDisplay);
 
-            const startButton2 = document.getElementById("startTimer2");
-            const pauseButton2 = document.getElementById("pauseTimer2");
-            const timerDisplay2 = document.getElementById("timerDisplay2");
+      const startButton = document.createElement("button");
+      
+      if (isMainNightTimer) { startButton.id = "mainNightStartButton"; }
+      startButton.textContent = startButtonName;
+      timerDisplay.appendChild(startButton);
 
-            startButton1.disabled = false;
-            pauseButton1.disabled = true;
-            timerDisplay1.innerText = "";
+      const timer = new Timer(duration, onUpdate, onComplete, isCountingUp);
+      timer.startButton = startButton;
 
-            startButton2.disabled = false;
-            pauseButton2.disabled = true;
-            timerDisplay2.innerText = "";
+      // Initial display
+      timer.updateDisplay();
 
-            pauseButton1.innerHTML = "Pause";
-            pauseButton1.onclick = function () { pauseTimer(1); };
+      if (isMainNightTimer) {
+        startButton.addEventListener("click", () => {
+          timer.reset();
+          timer.start();
+          startButton.disabled = true;
+        });
+      } else {
+        startButton.addEventListener("click", () => {
+          timer.reset();
+          timer.start();
+        });
+      }
 
-            pauseButton2.innerHTML = "Pause";
-            pauseButton2.onclick = function () { pauseTimer(2); };
+      return timer;
+    }
 
-            elapsedTime1 = 0;
-            elapsedTime2 = 0;
+    function updateTimers() {
+      const difficulty = document.getElementById("difficulty").value;
+      const nightDropdown = document.getElementById("night");
+
+      // Preserve the selected night
+      selectedNight = parseInt(nightDropdown.value);
+
+      // Populate the night dropdown based on the selected difficulty
+      populateNightDropdown(difficulty);
+
+      const timerOptions = {
+        "Casual": { timer2: ["180", "180", "120", "90", "60", "", "", "", "", "", "", "", "", ""], timer3: ["225", "225", "225", "225", "225", "", "", "", "", "", "", "", "", ""] },
+        "Normal": { timer2: ["180", "180", "120", "90", "100", "70", "70", "70", "60", "50", "", "", "", ""], timer3: ["200", "200", "200", "200", "200", "200", "200", "200", "200", "200", "", "", "", ""] },
+        "Nightmare": { timer2: ["180", "180", "120", "90", "90", "60", "60", "60", "60", "50", "50", "45", "40", "40"], timer3: ["150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150", "150"] }
+      };
+
+      const timer2Duration = timerOptions[difficulty].timer2[selectedNight - 1] || "0"; // Use "0" if undefined
+      const timer3Duration = timerOptions[difficulty].timer3[selectedNight - 1] || "0"; // Use "0" if undefined
+
+      timer2.reset();
+      timer2.duration = parseInt(timer2Duration);
+      timer2.updateDisplay();
+
+      timer3.reset();
+      timer3.duration = parseInt(timer3Duration);
+      timer3.updateDisplay();
+
+      resetTimers();
+      isStartButtonPressed = false;
+    }
+
+    // Function to populate the night dropdown based on the selected difficulty
+    function populateNightDropdown(difficulty) {
+      const nightDropdown = document.getElementById("night");
+      nightDropdown.innerHTML = ""; // Clear existing options
+
+      const numberOfNights = getNumberOfNights(difficulty);
+
+      for (let i = 1; i <= numberOfNights; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = `Night ${i}`;
+        nightDropdown.appendChild(option);
+      }
+
+      // Set the preserved selected night
+      nightDropdown.value = selectedNight.toString();
+    }
+
+    // Function to get the number of nights based on the difficulty
+    function getNumberOfNights(difficulty) {
+      switch (difficulty) {
+        case "Casual":
+          return 5;
+        case "Normal":
+          return 10;
+        case "Nightmare":
+          return 14;
+        default:
+          return 5; // Default to 5 nights for Casual difficulty
+      }
+    }
+
+
+    //// Setup Timers
+    const timerContainer = document.getElementById("timerContainer");
+
+    //Timer 1 Setup
+    const timer1Label = document.createElement("label");
+    timer1Label.innerText = "Night Timer / 15 mins:";
+    timerContainer.appendChild(timer1Label);
+
+    const timer1Display = document.createElement("div");
+    timer1Display.style.width = "150px";
+    timerContainer.appendChild(timer1Display);
+
+    const timer1 = setupTimer("timerContainer", 3600, (time) => timer1Display.textContent = time, () => alert("Night's over!"), true, "Start Night", true);
+
+    //Timer 2 Setup
+    const timer2Label = document.createElement("label");
+    timer2Label.innerText = "Light Timer (Automatic):";
+    timerContainer.appendChild(timer2Label);
+
+    const timer2Display = document.createElement("div");
+    timer2Display.style.width = "150px";
+    timerContainer.appendChild(timer2Display);
+
+    const timer2 = setupTimer("timerContainer", 30, (time) => timer2Display.textContent = time, () => playSound(), false);
+
+    //Timer 3 Setup
+    const timer3Label = document.createElement("label");
+    timer3Label.innerText = "Tanner Cooldown:";
+    timerContainer.appendChild(timer3Label);
+
+    const timer3Display = document.createElement("div");
+    timer3Display.style.width = "150px";
+    timerContainer.appendChild(timer3Display);
+
+    const timer3 = setupTimer("timerContainer", 30, (time) => timer3Display.textContent = time, () => playSound(), false);
+
+    // Start the second timer when the first one is clicked
+    timer1.startButton.addEventListener("click", () => {
+      timer2.reset();
+      timer2.start();
+      isStartButtonPressed = true;
+      updateStartButtonStyle();
+    });
+
+
+    //// Pause/Continue Timers Button
+    const pauseTimersButton = document.getElementById("pauseTimersButton");
+    pauseTimersButton.addEventListener("click", () => {
+      const isAnyRunning = timers.some(timer => timer.isRunning);
+      if (isAnyRunning) {
+        timers.forEach(timer => timer.pause());
+        disableAllStartButtons();
+        pauseTimersButton.textContent = "Continue Timers";
+      } else {
+        timers.forEach(timer => timer.continue());
+        enableTimerStartButtons();
+        pauseTimersButton.textContent = "Pause Timers";
+      }
+    });
+
+    function resetTimers() {
+      timers.forEach(timer => {
+        timer.reset();
+        timer.continue();
+      });
+      enableAllStartButtons();
+      pauseTimersButton.textContent = "Pause Timers";
+    }
+    //// Reset Timers Button
+    const resetTimersButton = document.getElementById("resetTimersButton");
+    resetTimersButton.addEventListener("click", () => {
+      resetTimers();
+      isStartButtonPressed = false;
+      updateStartButtonStyle();
+    });
+
+    function updateStartButtonStyle() {
+      const startButton = document.getElementById("pauseTimersButton");
+      if (isStartButtonPressed) {
+        startButton.classList.add("start-button-pressed");
+      } else {
+        startButton.classList.remove("start-button-pressed");
+      }
+    }
+
+    //// Array to store timers
+    const timers = [timer1, timer2, timer3];
+
+    //// Function to disable all start buttons
+    function disableAllStartButtons() {
+      timers.forEach(timer => timer.disableStartButton());
+    }
+
+    //// Function to enable all start buttons
+    function enableTimerStartButtons() {
+      timers.forEach(timer => {
+        if (timer !== timer1) {
+          timer.enableStartButton();
         }
+      });
+    }
 
-        updateNights();
-    </script>
+    function enableAllStartButtons() {
+      timers.forEach(timer => timer.enableStartButton());
+    }
+
+
+    function onPageLoad() {
+      var container = document.getElementById("hidden-text");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      var bgImage = document.getElementById("background-image");
+
+      //Easter egg stuff
+      if (urlParams.has('troo-imsorry') || urlParams.has('troo')) {
+        console.info("Surprise background");
+        bgImage.src = "images/background-phil.png";
+
+        surpriseText = document.createElement("div");
+        surpriseText.innerText = "Don't get fucked by the napper";
+        container.appendChild(surpriseText);
+
+        kappaImg = document.createElement("img");
+        kappaImg.src = "images/kappa.png";
+        kappaImg.width = "50";
+        kappaImg.height = "50";
+        container.appendChild(kappaImg);
+
+        if (urlParams.has('troo')) document.getElementById("soundEffect").setAttribute('src', 'sounds/pipe.wav');
+        return;
+      }
+
+      console.info("Default background");
+      bgImage.src = "images/background.png";
+      document.getElementById("soundEffect").setAttribute('src', 'sounds/timerOver.wav');
+
+    }
+
+    function playSound() {
+      var soundEffect = document.getElementById("soundEffect");
+
+      if (soundEffect.paused) {
+        soundEffect.play();
+      } else {
+        soundEffect.pause();
+        soundEffect.currentTime = 0;
+      }
+    }
+
+
+    window.onload = function () {
+      document.getElementById("difficulty").value = "Casual";
+
+      updateTimers();
+
+      setTimeout(function () {
+        setNightDropdownDefault();
+      }, 100);
+
+      onPageLoad();
+    };
+
+    function setNightDropdownDefault() {
+      const nightDropdown = document.getElementById("night");
+      nightDropdown.value = 1;
+
+      nightDropdown.dispatchEvent(new Event("change"));
+    }
+  </script>
+
 </body>
 
 </html>
