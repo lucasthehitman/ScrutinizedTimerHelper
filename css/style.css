@@ -1,6 +1,7 @@
 body {
     font-family: 'Tahoma', sans-serif;
     text-align: center;
+    align-content: end;
     margin: 1.5em;
     /* Adjusted margin for better spacing */
     overflow-x: hidden;
@@ -96,7 +97,6 @@ button:disabled {
     /* Lighter gray text for disabled state */
     cursor: not-allowed;
 }
-
 
 
 #resetTimersButton {

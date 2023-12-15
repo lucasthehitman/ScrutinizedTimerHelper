@@ -21,7 +21,6 @@
 
 
   <div id="dropdownContainer">
-    <!-- Difficulty Dropdown -->
     <label for="difficulty">Difficulty:</label>
     <select id="difficulty" onchange="updateTimers()">
       <option value="Casual">Casual</option>
@@ -29,23 +28,19 @@
       <option value="Nightmare">Nightmare</option>
     </select>
 
-    <!-- Night Dropdown -->
     <label for="night">Night:</label>
     <select id="night" onchange="updateTimers()">
-      <!-- Night options will be dynamically populated based on the selected difficulty -->
     </select>
   </div>
 
   <div style="height: 1rem"></div>
-  <!-- Timer Container -->
+
   <div id="timerContainer"></div>
 
-  <!-- Pause/Continue Timers Button -->
-  <!-- Start button -->
+
+  
   <button id="pauseTimersButton" class="${isStartButtonPressed ? 'start-button-pressed' : ''}">Pause Timers</button>
-
-
-  <!-- Reset Timers Button -->
+  <div style="height: 4rem"></div>
   <button id="resetTimersButton">Reset Night</button>
 
 
@@ -221,6 +216,7 @@
       resetTimers();
       isStartButtonPressed = false;
     }
+
 
     // Function to populate the night dropdown based on the selected difficulty
     function populateNightDropdown(difficulty) {
